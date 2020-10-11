@@ -1,0 +1,15 @@
+{
+  "name": "WallCutter",
+  "title": "WallCutter",
+  "description": "",
+  "author": ["HadaIonut"],
+  "version": "0.0.1",
+  "esmodules": ["scripts/WallCutter.js"],
+  "styles": [""],
+  "minimumCoreVersion": "0.7.0",
+  "compatibleCoreVersion": "0.7.3",
+  "url": "",
+  "manifest": "",
+  "download": "",
+  "changelog": ""
+}
