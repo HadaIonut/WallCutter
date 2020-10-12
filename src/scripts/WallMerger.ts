@@ -50,7 +50,7 @@ class WallMerger {
      * @param wallCoords
      * @private
      */
-    private _makeWallEquation(wallCoords: number[]): number[] {
+    private _makeNormalVectorForAWall(wallCoords: number[]): number[] {
         return [wallCoords[2] - wallCoords[0], wallCoords[3] - wallCoords[1]]
     }
 
@@ -78,9 +78,16 @@ class WallMerger {
         const B = [firstWall[2], firstWall[3]];
         const C = [secondWall[0], secondWall[1]];
         const D = [secondWall[2], secondWall[3]];
-        return this.ccw(A, C, D) != this.ccw(B, C, D) && this.ccw(A, B, C) != this.ccw(A, B, D)
+        return (this.ccw(A, C, D) != this.ccw(B, C, D) && this.ccw(A, B, C) != this.ccw(A, B, D))
     }
 
+    /**
+     * Returns true if the target wall isn't linked with main wall
+     *
+     * @param mainWall
+     * @param currentWall
+     * @private
+     */
     private _shouldIMerge(mainWall: any, currentWall: any): boolean {
         const linkedSegments = mainWall.getLinkedSegments().walls;
         for (const segment of linkedSegments) {
@@ -89,25 +96,50 @@ class WallMerger {
         return true;
     }
 
-    private _mergeWalls(mainWall: any, targetWall: any) {
-
-    }
-
-    private _findOverlappingWalls(mainWallCoords: any, mainWall) {
+    /**
+     * Returns a list of the walls that are overlapping with a main wall
+     *
+     * @param mainWallCoords - point values of the main wall
+     * @param mainWall - main wall structure
+     * @private
+     */
+    private _findOverlappingWalls(mainWallCoords: any, mainWall: any) {
         const walls = canvas.walls.objects.children;
-        const mainWallEquation = this._makeWallEquation(mainWallCoords);
+        const mainWallEquation = this._makeNormalVectorForAWall(mainWallCoords);
+        let toMergeList = [];
 
         walls.forEach((wall) => {
             if (!this._shouldIMerge(mainWall, wall)) return;
             const wallCoords = wall.data.c;
-            const wallEquation = this._makeWallEquation(wallCoords);
+            const wallEquation = this._makeNormalVectorForAWall(wallCoords);
             const angleBetweenWalls = Math.acos(this._calculateCosOfAngleBetween2Walls(mainWallEquation, wallEquation))
-            if (this._checkIntersection(mainWallCoords, wallCoords)) console.log(angleBetweenWalls);
+            if (this._checkIntersection(mainWallCoords, wallCoords) && angleBetweenWalls < 0.5) toMergeList.push(wall);
+            //TODO: using equation of a straight line add support for points that are exactly on the line
         })
+
+        return toMergeList;
+    }
+
+    private _makeSlopeFromTwoPoints(firstPoint: [number, number], secondPoint: [number, number]): number {
+        return (firstPoint[1] - secondPoint[1]) / (firstPoint[0] - secondPoint[1]);
+    }
+
+    private _makeLineEquation(line: number[]): object {
+        const equation = {a: 0, b: 1, c: 0}
+        const slope = this._makeSlopeFromTwoPoints([line[0], line[1]], [line[2], line[3]]);
+        equation.a = slope;
+        equation.c = line[1] - slope * line[0];
+        return equation;
+    }
+
+    private _findProjectionOfPointsOnALine(line: number[], point: [number, number]): [number, number] {
+
+        return
     }
 
     public mergeWalls(wall: any) {
-        this._findOverlappingWalls(wall.data.c, wall);
+        const wallsToMerge = this._findOverlappingWalls(wall.data.c, wall);
+        console.log(wallsToMerge);
     }
 }
 
