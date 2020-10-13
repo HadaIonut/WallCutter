@@ -120,18 +120,6 @@ class WallMerger {
         return toMergeList;
     }
 
-    private _makeSlopeFromTwoPoints(firstPoint: [number, number], secondPoint: [number, number]): number {
-        return (firstPoint[1] - secondPoint[1]) / (firstPoint[0] - secondPoint[0]);
-    }
-
-    private _makeLineEquation(line: number[]): any {
-        const equation = {a: 0, b: -1, c: 0}
-        const slope = this._makeSlopeFromTwoPoints([line[0], line[1]], [line[2], line[3]]);
-        equation.a = slope;
-        equation.c = -slope * line[0] + line[1]
-        return {equation: equation, slope: slope};
-    }
-
     /**
      * Here is another function that I cannot understand. If for some reason I have to touch this again, I will not.
      * This function has been sent by God, or by his real name @MBo on stackOverFlow, since it is made by God I cannot question him
@@ -146,32 +134,95 @@ class WallMerger {
         return [Math.floor(line[0] + (line[2] - line[0]) * CF), Math.floor(line[1] + (line[3] - line[1]) * CF)];
     }
 
-    private async _createNewWallFromPointsArray(pointsArray: any): Promise<void> {
+    /**
+     * Checks in the worst way if two objects are equivalent
+     *
+     * @param a - first object
+     * @param b - second object
+     * @private
+     */
+    private _isEquivalent(a: any, b: any) {
+        const aProps = Object.getOwnPropertyNames(a);
+        const bProps = Object.getOwnPropertyNames(b);
+
+        if (aProps.length !== bProps.length) {
+            return false;
+        }
+        for (let i = 0; i < aProps.length; i++) {
+            const propName = aProps[i];
+
+            if (a[propName] !== b[propName]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Creates new walls from a list of points
+     *
+     * @param pointsArray - a list of points
+     * @param mainWallData - the data of the support wall
+     * @private
+     */
+    private async _createNewWallFromPointsArray(pointsArray: any, mainWallData: any): Promise<void> {
+        let wallData;
         for (let index = 0; index < pointsArray.length - 1; index++) {
+            this._isEquivalent(pointsArray[index].data, pointsArray[index+1].data) ? wallData = pointsArray[index].data : wallData = mainWallData;
             // @ts-ignore
             await Wall.create({
-                c: pointsArray[index].concat(pointsArray[index + 1])
+                c: pointsArray[index].c.concat(pointsArray[index + 1].c),
+                ...wallData
             })
         }
+    }
+
+    /**
+     * Creates an object for each point of the new line
+     *
+     * @param pointCoords - coordinates of the point
+     * @param pointData - the data of the point
+     * @private
+     */
+    private createPointObject(pointCoords: [number, number], pointData: any): any {
+        const returnObject = {
+            c: pointCoords,
+            data: {
+                ...pointData
+            }
+        }
+        delete returnObject.data.c;
+        delete returnObject.data._id;
+        return returnObject;
     }
 
     public async mergeWalls(mainWall: any) {
         const wallsToMerge = this._findOverlappingWalls(mainWall.data.c, mainWall);
         const projectedPoints = [];
-        projectedPoints.push([mainWall.data.c[0], mainWall.data.c[1]]);
-        projectedPoints.push([mainWall.data.c[2], mainWall.data.c[3]]);
-        console.log(wallsToMerge);
+
+        projectedPoints.push(this.createPointObject([mainWall.data.c[0], mainWall.data.c[1]], mainWall.data));
+        projectedPoints.push(this.createPointObject([mainWall.data.c[2], mainWall.data.c[3]], mainWall.data));
+
+        const mainWallData = projectedPoints[0].data;
+
         for (const wall of wallsToMerge) {
             const firstPoint = this._findProjectionOfPointsOnALine(mainWall.data.c, [wall.data.c[0], wall.data.c[1]]);
-            projectedPoints.push(firstPoint);
+            projectedPoints.push(this.createPointObject(firstPoint, wall.data));
+
             const secondPoint = this._findProjectionOfPointsOnALine(mainWall.data.c, [wall.data.c[2], wall.data.c[3]]);
-            projectedPoints.push(secondPoint);
+            projectedPoints.push(this.createPointObject(secondPoint, wall.data));
+
             await wall.delete();
         }
-        projectedPoints.sort();
+
+        projectedPoints.sort((a, b): number => {
+            if (a.c[0] === b.c[0]) return a.c[1] - b.c[1];
+            return a.c[0] - b.c[0];
+        });
+
         mainWall.release();
         mainWall.delete();
-        await this._createNewWallFromPointsArray(projectedPoints);
+        await this._createNewWallFromPointsArray(projectedPoints, mainWallData);
     }
 }
 
