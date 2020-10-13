@@ -14,6 +14,7 @@ Hooks.on("renderWallConfig", (data, html) => {
     let mergeButton = $("<button class='import-markdown'><i class='fas fa-file-import'></i>Merge overlapping walls</button>");
     mergeButton.on('click', () => {
         WallMerger.mergeWalls(data.object);
+        data.close();
     })
     html.find(".window-content").append(cutButton);
     html.find(".window-content").append(mergeButton);

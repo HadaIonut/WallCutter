@@ -142,28 +142,36 @@ class WallMerger {
      * @private
      */
     private _findProjectionOfPointsOnALine(line: number[], point: [number, number]): [number, number] {
-        const CF = ((line[2] - line[0]) * (point[0] - line[0]) + (line[3] - line[1]) * (point[1] - line[1])) / (Math.pow(line[2] - line[0],2)  + Math.pow(line[3] - line[1],2))
-        return [line[0] + (line[2] - line[0]) * CF, line[1] + (line[3] - line[1]) * CF];
+        const CF = ((line[2] - line[0]) * (point[0] - line[0]) + (line[3] - line[1]) * (point[1] - line[1])) / (Math.pow(line[2] - line[0], 2) + Math.pow(line[3] - line[1], 2))
+        return [Math.floor(line[0] + (line[2] - line[0]) * CF), Math.floor(line[1] + (line[3] - line[1]) * CF)];
     }
 
-    public mergeWalls(mainWall: any) {
-        const wallsToMerge = this._findOverlappingWalls(mainWall.data.c, mainWall);
-        console.log(wallsToMerge);
-        wallsToMerge.forEach((wall) => {
-            const firstPoint = this._findProjectionOfPointsOnALine(mainWall.data.c, [wall.data.c[0], wall.data.c[1]])
-            const line = firstPoint.concat(this._findProjectionOfPointsOnALine(mainWall.data.c, [wall.data.c[2], wall.data.c[3]]))
-            console.log(line)
+    private async _createNewWallFromPointsArray(pointsArray: any): Promise<void> {
+        for (let index = 0; index < pointsArray.length - 1; index++) {
             // @ts-ignore
-            Wall.create({
-                c: line,
-                flags: wall.data.flags,
-                move: wall.data.move,
-                sense: wall.data.sense,
-                door: wall.data.door,
-                ds: wall.data.ds
+            await Wall.create({
+                c: pointsArray[index].concat(pointsArray[index + 1])
             })
-            wall.destroy();
-        })
+        }
+    }
+
+    public async mergeWalls(mainWall: any) {
+        const wallsToMerge = this._findOverlappingWalls(mainWall.data.c, mainWall);
+        const projectedPoints = [];
+        projectedPoints.push([mainWall.data.c[0], mainWall.data.c[1]]);
+        projectedPoints.push([mainWall.data.c[2], mainWall.data.c[3]]);
+        console.log(wallsToMerge);
+        for (const wall of wallsToMerge) {
+            const firstPoint = this._findProjectionOfPointsOnALine(mainWall.data.c, [wall.data.c[0], wall.data.c[1]]);
+            projectedPoints.push(firstPoint);
+            const secondPoint = this._findProjectionOfPointsOnALine(mainWall.data.c, [wall.data.c[2], wall.data.c[3]]);
+            projectedPoints.push(secondPoint);
+            await wall.delete();
+        }
+        projectedPoints.sort();
+        mainWall.release();
+        mainWall.delete();
+        await this._createNewWallFromPointsArray(projectedPoints);
     }
 }
 
