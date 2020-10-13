@@ -121,25 +121,49 @@ class WallMerger {
     }
 
     private _makeSlopeFromTwoPoints(firstPoint: [number, number], secondPoint: [number, number]): number {
-        return (firstPoint[1] - secondPoint[1]) / (firstPoint[0] - secondPoint[1]);
+        return (firstPoint[1] - secondPoint[1]) / (firstPoint[0] - secondPoint[0]);
     }
 
-    private _makeLineEquation(line: number[]): object {
-        const equation = {a: 0, b: 1, c: 0}
+    private _makeLineEquation(line: number[]): any {
+        const equation = {a: 0, b: -1, c: 0}
         const slope = this._makeSlopeFromTwoPoints([line[0], line[1]], [line[2], line[3]]);
         equation.a = slope;
-        equation.c = line[1] - slope * line[0];
-        return equation;
+        equation.c = -slope * line[0] + line[1]
+        return {equation: equation, slope: slope};
     }
 
+    /**
+     * Here is another function that I cannot understand. If for some reason I have to touch this again, I will not.
+     * This function has been sent by God, or by his real name @MBo on stackOverFlow, since it is made by God I cannot question him
+     * So I do not dare edit this code.
+     *
+     * @param line - base line
+     * @param point - point to be projected
+     * @private
+     */
     private _findProjectionOfPointsOnALine(line: number[], point: [number, number]): [number, number] {
-
-        return
+        const CF = ((line[2] - line[0]) * (point[0] - line[0]) + (line[3] - line[1]) * (point[1] - line[1])) / (Math.pow(line[2] - line[0],2)  + Math.pow(line[3] - line[1],2))
+        return [line[0] + (line[2] - line[0]) * CF, line[1] + (line[3] - line[1]) * CF];
     }
 
-    public mergeWalls(wall: any) {
-        const wallsToMerge = this._findOverlappingWalls(wall.data.c, wall);
+    public mergeWalls(mainWall: any) {
+        const wallsToMerge = this._findOverlappingWalls(mainWall.data.c, mainWall);
         console.log(wallsToMerge);
+        wallsToMerge.forEach((wall) => {
+            const firstPoint = this._findProjectionOfPointsOnALine(mainWall.data.c, [wall.data.c[0], wall.data.c[1]])
+            const line = firstPoint.concat(this._findProjectionOfPointsOnALine(mainWall.data.c, [wall.data.c[2], wall.data.c[3]]))
+            console.log(line)
+            // @ts-ignore
+            Wall.create({
+                c: line,
+                flags: wall.data.flags,
+                move: wall.data.move,
+                sense: wall.data.sense,
+                door: wall.data.door,
+                ds: wall.data.ds
+            })
+            wall.destroy();
+        })
     }
 }
 
