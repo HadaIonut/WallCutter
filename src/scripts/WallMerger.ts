@@ -96,6 +96,17 @@ class WallMerger {
         return true;
     }
 
+    private _isBetween(firstPoint, secondPoint, targetPoint): boolean {
+        const crossProduct = (targetPoint[1] - firstPoint[1]) * (secondPoint[0] - firstPoint[0]) - (targetPoint[0] - firstPoint[0]) * (secondPoint[1] - firstPoint[1]);
+        if (Math.abs(crossProduct) !== 0) return false;
+
+        const dotProduct = (targetPoint[0]- firstPoint[0]) * (secondPoint[0] - firstPoint[0]) + (targetPoint[1] - firstPoint[1]) * (secondPoint[1] - firstPoint[1]);
+        if (dotProduct < 0) return false;
+
+        const squaredLength = Math.pow(secondPoint[0] - firstPoint[0],2) + Math.pow(secondPoint[1] - firstPoint[1],2);
+        return dotProduct <= squaredLength;
+    }
+
     /**
      * Returns a list of the walls that are overlapping with a main wall
      *
@@ -114,7 +125,12 @@ class WallMerger {
             const wallEquation = this._makeNormalVectorForAWall(wallCoords);
             const angleBetweenWalls = Math.acos(this._calculateCosOfAngleBetween2Walls(mainWallEquation, wallEquation))
             if (this._checkIntersection(mainWallCoords, wallCoords) && angleBetweenWalls < 0.5) toMergeList.push(wall);
-            //TODO: using equation of a straight line add support for points that are exactly on the line
+            if (this._isBetween([mainWallCoords[0],mainWallCoords[1]],
+                [mainWallCoords[2],mainWallCoords[3]],
+                [wallCoords[0],wallCoords[1]])) toMergeList.push(wall);
+            if (this._isBetween([mainWallCoords[0],mainWallCoords[1]],
+                [mainWallCoords[2],mainWallCoords[3]],
+                [wallCoords[2],wallCoords[3]])) toMergeList.push(wall);
         })
 
         return toMergeList;
@@ -168,7 +184,7 @@ class WallMerger {
     private async _createNewWallFromPointsArray(pointsArray: any, mainWallData: any): Promise<void> {
         let wallData;
         for (let index = 0; index < pointsArray.length - 1; index++) {
-            this._isEquivalent(pointsArray[index].data, pointsArray[index+1].data) ? wallData = pointsArray[index].data : wallData = mainWallData;
+            this._isEquivalent(pointsArray[index].data, pointsArray[index + 1].data) ? wallData = pointsArray[index].data : wallData = mainWallData;
             // @ts-ignore
             await Wall.create({
                 c: pointsArray[index].c.concat(pointsArray[index + 1].c),
