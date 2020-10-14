@@ -10,6 +10,8 @@ class WallMerger {
         return WallMerger._instance;
     }
 
+    readonly angleEpsilon = 0.5; //A value in radians that represents the acceptable user error of a wall placed on top of another
+
     /**
      * Returns the cos of the angle between 2 walls
      *
@@ -96,6 +98,14 @@ class WallMerger {
         return true;
     }
 
+    /**
+     * Checks if the targetPoint is between the first and second points
+     *
+     * @param firstPoint - first point
+     * @param secondPoint - second point
+     * @param targetPoint - the point that is checked
+     * @private
+     */
     private _isBetween(firstPoint, secondPoint, targetPoint): boolean {
         const crossProduct = (targetPoint[1] - firstPoint[1]) * (secondPoint[0] - firstPoint[0]) - (targetPoint[0] - firstPoint[0]) * (secondPoint[1] - firstPoint[1]);
         if (Math.abs(crossProduct) !== 0) return false;
@@ -124,10 +134,12 @@ class WallMerger {
             const wallCoords = wall.data.c;
             const wallEquation = this._makeNormalVectorForAWall(wallCoords);
             const angleBetweenWalls = Math.acos(this._calculateCosOfAngleBetween2Walls(mainWallEquation, wallEquation))
-            if (this._checkIntersection(mainWallCoords, wallCoords) && angleBetweenWalls < 0.5) toMergeList.push(wall);
+            if (this._checkIntersection(mainWallCoords, wallCoords) && angleBetweenWalls < this.angleEpsilon) toMergeList.push(wall);
+
             if (this._isBetween([mainWallCoords[0],mainWallCoords[1]],
                 [mainWallCoords[2],mainWallCoords[3]],
                 [wallCoords[0],wallCoords[1]])) toMergeList.push(wall);
+
             if (this._isBetween([mainWallCoords[0],mainWallCoords[1]],
                 [mainWallCoords[2],mainWallCoords[3]],
                 [wallCoords[2],wallCoords[3]])) toMergeList.push(wall);
@@ -212,6 +224,11 @@ class WallMerger {
         return returnObject;
     }
 
+    /**
+     * I was very high on coffee, I have no idee what the fuck does this do
+     *
+     * @param mainWall - the main wall object
+     */
     public async mergeWalls(mainWall: any) {
         const wallsToMerge = this._findOverlappingWalls(mainWall.data.c, mainWall);
         const projectedPoints = [];
