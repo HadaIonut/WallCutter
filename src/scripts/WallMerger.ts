@@ -11,6 +11,7 @@ class WallMerger {
     }
 
     readonly angleEpsilon = 0.5; //A value in radians that represents the acceptable user error of a wall placed on top of another
+    readonly distanceEpsilon = 15 // A value that represents the acceptable distance from 2 non touching lines that should still be merged
 
     /**
      * Returns the cos of the angle between 2 walls
@@ -157,6 +158,32 @@ class WallMerger {
     }
 
     /**
+     * Decides if 2 non-linked walls should be merged
+     *
+     * @param targetWall - wall to merge
+     * @param mainWall - main wall to merge into
+     * @param angleBetweenWalls - angle between the walls in radians
+     * @private
+     */
+    private _shouldAddToList (targetWall: number[], mainWall: number[], angleBetweenWalls: number):boolean {
+        const mainLineFirstPoint = [mainWall[0],mainWall[1]];
+        const mainLineSecondPoint = [mainWall[2],mainWall[3]];
+        const wallFirstPoint = [targetWall[0],targetWall[1]];
+        const wallSecondPoint = [targetWall[2],targetWall[3]];
+
+        if (this._checkIntersection(mainWall, targetWall) && angleBetweenWalls < this.angleEpsilon) return true;
+
+        else if (this._isBetween(mainLineFirstPoint, mainLineSecondPoint, wallFirstPoint)) return true;
+
+        else if (this._isBetween(mainLineFirstPoint, mainLineSecondPoint, wallSecondPoint)) return true;
+
+        else if (this._distanceToSegment(wallFirstPoint, mainLineFirstPoint, mainLineSecondPoint) < this.distanceEpsilon &&
+            this._distanceToSegment(wallSecondPoint, mainLineFirstPoint, mainLineSecondPoint) < this.distanceEpsilon) return true;
+
+        return false;
+    }
+
+    /**
      * Returns a list of the walls that are overlapping with a main wall
      *
      * @param mainWallCoords - point values of the main wall
@@ -166,8 +193,6 @@ class WallMerger {
     private _findOverlappingWalls(mainWallCoords: any, mainWall: any) {
         const walls = canvas.walls.objects.children;
         const mainWallEquation = this._makeNormalVectorForAWall(mainWallCoords);
-        const mainLineFirstPoint = [mainWallCoords[0],mainWallCoords[1]];
-        const mainLineSecondPoint = [mainWallCoords[2],mainWallCoords[3]];
         let toMergeList = [];
 
         walls.forEach((wall) => {
@@ -175,20 +200,7 @@ class WallMerger {
             const wallCoords = wall.data.c;
             const wallEquation = this._makeNormalVectorForAWall(wallCoords);
             const angleBetweenWalls = Math.acos(this._calculateCosOfAngleBetween2Walls(mainWallEquation, wallEquation))
-            const wallFirstPoint = [wallCoords[0],wallCoords[1]];
-            const wallSecondPoint = [wallCoords[2],wallCoords[3]];
-            if (this._checkIntersection(mainWallCoords, wallCoords) && angleBetweenWalls < this.angleEpsilon) toMergeList.push(wall);
-
-            else if (this._isBetween(mainLineFirstPoint, mainLineSecondPoint, wallFirstPoint))
-                toMergeList.push(wall);
-
-            else if (this._isBetween(mainLineFirstPoint, mainLineSecondPoint, wallSecondPoint))
-                toMergeList.push(wall);
-
-            else if (this._distanceToSegment(wallFirstPoint, mainLineFirstPoint, mainLineSecondPoint) < 15 &&
-                this._distanceToSegment(wallSecondPoint, mainLineFirstPoint, mainLineSecondPoint) < 15)
-                toMergeList.push(wall);
-
+            if (this._shouldAddToList(wallCoords, mainWallCoords, angleBetweenWalls)) toMergeList.push(wall);
         })
 
         return toMergeList;
