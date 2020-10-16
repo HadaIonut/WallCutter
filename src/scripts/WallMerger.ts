@@ -118,6 +118,45 @@ class WallMerger {
     }
 
     /**
+     * Calculates the distance between 2 points
+     *
+     * @param firstPoint
+     * @param secondPoint
+     * @private
+     */
+    private _distance2 (firstPoint, secondPoint) {
+        return Math.pow(firstPoint[0] - secondPoint[0],2) + Math.pow(firstPoint[1] - secondPoint[1],2);
+    }
+
+    /**
+     * Calculates the square of the distance from a point to a line
+     *
+     * @param targetPoint - the point to calculate the distance from
+     * @param firstPointOfLine
+     * @param secondPointOfLine
+     * @private
+     */
+    private _distToSegmentSquared (targetPoint, firstPointOfLine, secondPointOfLine) {
+        const l2 = this._distance2(firstPointOfLine, secondPointOfLine);
+        if (l2 === 0) return this._distance2(targetPoint, firstPointOfLine);
+        let t = ((targetPoint[0] - firstPointOfLine[0]) * (secondPointOfLine[0] - firstPointOfLine[0]) + (targetPoint[1] - firstPointOfLine[1]) * (secondPointOfLine[1] - firstPointOfLine[1])) / l2;
+        t = Math.max(0, Math.min(1, t));
+        return this._distance2(targetPoint, [ firstPointOfLine[0] + t * (secondPointOfLine[0] - firstPointOfLine[0]), firstPointOfLine[1] + t * (secondPointOfLine[1] - firstPointOfLine[1]) ]);
+    }
+
+    /**
+     * Calculates the distance from a point to a line
+     *
+     * @param targetPoint - the point to calculate the distance from
+     * @param firstPointOfLine
+     * @param secondPointOfLine
+     * @private
+     */
+    private _distanceToSegment (targetPoint, firstPointOfLine, secondPointOfLine) {
+        return Math.sqrt(this._distToSegmentSquared(targetPoint, firstPointOfLine, secondPointOfLine));
+    }
+
+    /**
      * Returns a list of the walls that are overlapping with a main wall
      *
      * @param mainWallCoords - point values of the main wall
@@ -127,6 +166,8 @@ class WallMerger {
     private _findOverlappingWalls(mainWallCoords: any, mainWall: any) {
         const walls = canvas.walls.objects.children;
         const mainWallEquation = this._makeNormalVectorForAWall(mainWallCoords);
+        const mainLineFirstPoint = [mainWallCoords[0],mainWallCoords[1]];
+        const mainLineSecondPoint = [mainWallCoords[2],mainWallCoords[3]];
         let toMergeList = [];
 
         walls.forEach((wall) => {
@@ -134,15 +175,20 @@ class WallMerger {
             const wallCoords = wall.data.c;
             const wallEquation = this._makeNormalVectorForAWall(wallCoords);
             const angleBetweenWalls = Math.acos(this._calculateCosOfAngleBetween2Walls(mainWallEquation, wallEquation))
+            const wallFirstPoint = [wallCoords[0],wallCoords[1]];
+            const wallSecondPoint = [wallCoords[2],wallCoords[3]];
             if (this._checkIntersection(mainWallCoords, wallCoords) && angleBetweenWalls < this.angleEpsilon) toMergeList.push(wall);
 
-            if (this._isBetween([mainWallCoords[0],mainWallCoords[1]],
-                [mainWallCoords[2],mainWallCoords[3]],
-                [wallCoords[0],wallCoords[1]])) toMergeList.push(wall);
+            else if (this._isBetween(mainLineFirstPoint, mainLineSecondPoint, wallFirstPoint))
+                toMergeList.push(wall);
 
-            if (this._isBetween([mainWallCoords[0],mainWallCoords[1]],
-                [mainWallCoords[2],mainWallCoords[3]],
-                [wallCoords[2],wallCoords[3]])) toMergeList.push(wall);
+            else if (this._isBetween(mainLineFirstPoint, mainLineSecondPoint, wallSecondPoint))
+                toMergeList.push(wall);
+
+            else if (this._distanceToSegment(wallFirstPoint, mainLineFirstPoint, mainLineSecondPoint) < 15 &&
+                this._distanceToSegment(wallSecondPoint, mainLineFirstPoint, mainLineSecondPoint) < 15)
+                toMergeList.push(wall);
+
         })
 
         return toMergeList;
