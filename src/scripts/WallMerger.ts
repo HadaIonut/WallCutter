@@ -254,7 +254,7 @@ class WallMerger {
         });
 
         mainWall.release();
-        mainWall.delete();
+        await mainWall.delete();
         await this._createNewWallFromPointsArray(projectedPoints, mainWallData);
     }
 }

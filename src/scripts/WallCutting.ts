@@ -26,7 +26,7 @@ class WallCutting {
         const coords = wall.data.c;
         //first has 4 coords, the first 2 are the x and y of the first point while the last 2 are x, y of the center of the segment
         const first = [coords[0], coords[1], Math.floor((coords[0] + coords[2]) / 2), Math.floor((coords[1] + coords[3]) / 2)];
-        //seconds has 4 coords the first 2 are the x and y of the center point of the segment and the last 2 are the x and y of the last point.
+        //second has 4 coords the first 2 are the x and y of the center point of the segment and the last 2 are the x and y of the last point.
         const second = [Math.floor((coords[0] + coords[2]) / 2), Math.floor((coords[1] + coords[3]) / 2), coords[2], coords[3]];
 
         await this._createWallAtCoords(first, wall);
@@ -36,7 +36,7 @@ class WallCutting {
     public async cutTheWall(wall: any) {
         await this._createNewWalls(wall);
         wall.release();
-        wall.destroy();
+        await wall.delete();
     }
 
 }
