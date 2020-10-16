@@ -6,14 +6,14 @@ Hooks.on("renderWallConfig", (data, html) => {
     if (!game.user.isGM) return;
 
     let cutButton = $("<button><i class='fas fa-cut'></i>Cut The Wall</button>");
-    cutButton.on('click', () => {
-        WallCutting.cutTheWall(data.object);
+    cutButton.on('click', async () => {
+        await WallCutting.cutTheWall(data.object);
         data.close();
     });
 
     let mergeButton = $("<button><i class='fas fa-code-branch'></i>Merge overlapping walls</button>");
-    mergeButton.on('click', () => {
-        WallMerger.mergeWalls(data.object);
+    mergeButton.on('click', async () => {
+        await WallMerger.mergeWalls(data.object);
         data.close();
     })
 
