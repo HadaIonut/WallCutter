@@ -1,3 +1,5 @@
+import enumerate = Reflect.enumerate;
+
 class WallMerger {
 
     private static _instance: WallMerger;
@@ -111,10 +113,10 @@ class WallMerger {
         const crossProduct = (targetPoint[1] - firstPoint[1]) * (secondPoint[0] - firstPoint[0]) - (targetPoint[0] - firstPoint[0]) * (secondPoint[1] - firstPoint[1]);
         if (Math.abs(crossProduct) !== 0) return false;
 
-        const dotProduct = (targetPoint[0]- firstPoint[0]) * (secondPoint[0] - firstPoint[0]) + (targetPoint[1] - firstPoint[1]) * (secondPoint[1] - firstPoint[1]);
+        const dotProduct = (targetPoint[0] - firstPoint[0]) * (secondPoint[0] - firstPoint[0]) + (targetPoint[1] - firstPoint[1]) * (secondPoint[1] - firstPoint[1]);
         if (dotProduct < 0) return false;
 
-        const squaredLength = Math.pow(secondPoint[0] - firstPoint[0],2) + Math.pow(secondPoint[1] - firstPoint[1],2);
+        const squaredLength = Math.pow(secondPoint[0] - firstPoint[0], 2) + Math.pow(secondPoint[1] - firstPoint[1], 2);
         return dotProduct <= squaredLength;
     }
 
@@ -125,8 +127,8 @@ class WallMerger {
      * @param secondPoint
      * @private
      */
-    private _distance2 (firstPoint, secondPoint) {
-        return Math.pow(firstPoint[0] - secondPoint[0],2) + Math.pow(firstPoint[1] - secondPoint[1],2);
+    private _distance2(firstPoint: [number, number], secondPoint: [number, number]): number {
+        return Math.pow(firstPoint[0] - secondPoint[0], 2) + Math.pow(firstPoint[1] - secondPoint[1], 2);
     }
 
     /**
@@ -137,12 +139,12 @@ class WallMerger {
      * @param secondPointOfLine
      * @private
      */
-    private _distToSegmentSquared (targetPoint, firstPointOfLine, secondPointOfLine) {
+    private _distToSegmentSquared(targetPoint: [number, number], firstPointOfLine: [number, number], secondPointOfLine: [number, number]): number {
         const l2 = this._distance2(firstPointOfLine, secondPointOfLine);
         if (l2 === 0) return this._distance2(targetPoint, firstPointOfLine);
         let t = ((targetPoint[0] - firstPointOfLine[0]) * (secondPointOfLine[0] - firstPointOfLine[0]) + (targetPoint[1] - firstPointOfLine[1]) * (secondPointOfLine[1] - firstPointOfLine[1])) / l2;
         t = Math.max(0, Math.min(1, t));
-        return this._distance2(targetPoint, [ firstPointOfLine[0] + t * (secondPointOfLine[0] - firstPointOfLine[0]), firstPointOfLine[1] + t * (secondPointOfLine[1] - firstPointOfLine[1]) ]);
+        return this._distance2(targetPoint, [firstPointOfLine[0] + t * (secondPointOfLine[0] - firstPointOfLine[0]), firstPointOfLine[1] + t * (secondPointOfLine[1] - firstPointOfLine[1])]);
     }
 
     /**
@@ -153,7 +155,7 @@ class WallMerger {
      * @param secondPointOfLine
      * @private
      */
-    private _distanceToSegment (targetPoint, firstPointOfLine, secondPointOfLine) {
+    private _distanceToSegment(targetPoint: [number, number], firstPointOfLine: [number, number], secondPointOfLine: [number, number]): number {
         return Math.sqrt(this._distToSegmentSquared(targetPoint, firstPointOfLine, secondPointOfLine));
     }
 
@@ -165,11 +167,11 @@ class WallMerger {
      * @param angleBetweenWalls - angle between the walls in radians
      * @private
      */
-    private _shouldAddToList (targetWall: number[], mainWall: number[], angleBetweenWalls: number):boolean {
-        const mainLineFirstPoint = [mainWall[0],mainWall[1]];
-        const mainLineSecondPoint = [mainWall[2],mainWall[3]];
-        const wallFirstPoint = [targetWall[0],targetWall[1]];
-        const wallSecondPoint = [targetWall[2],targetWall[3]];
+    private _shouldAddToList(targetWall: number[], mainWall: number[], angleBetweenWalls: number): boolean {
+        const mainLineFirstPoint: [number, number] = [mainWall[0], mainWall[1]];
+        const mainLineSecondPoint: [number, number] = [mainWall[2], mainWall[3]];
+        const wallFirstPoint: [number, number] = [targetWall[0], targetWall[1]];
+        const wallSecondPoint: [number, number] = [targetWall[2], targetWall[3]];
 
         if (this._checkIntersection(mainWall, targetWall) && angleBetweenWalls < this.angleEpsilon) return true;
 
