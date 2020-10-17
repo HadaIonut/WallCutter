@@ -1,5 +1,3 @@
-import enumerate = Reflect.enumerate;
-
 class WallMerger {
 
     private static _instance: WallMerger;
