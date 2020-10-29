@@ -1,8 +1,7 @@
 import WallCutting from "./WallCutting";
 import WallMerger from "./WallMerger";
 
-Hooks.on("renderWallConfig", (data, html) => {
-    console.log(data);
+Hooks.on("renderWallConfig", (data, $html) => {
     if (!game.user.isGM) return;
 
     let cutButton = $("<button><i class='fas fa-cut'></i>Cut The Wall</button>");
@@ -17,7 +16,10 @@ Hooks.on("renderWallConfig", (data, html) => {
         data.close();
     })
 
-    const location = html.find(".window-content").children();
+    const location = $html.find(".window-content").children();
     location.append(cutButton);
     location.append(mergeButton);
+
+    $html.css({height:350});
+    data.setPosition({height:350});
 })
