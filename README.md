@@ -11,12 +11,12 @@ The tools are selected from the menu opened by double-clicking a node from a wal
 ## Wall Cutting
 
 This is the simplest tool to use. It simply creates a new connection point in the center of the selected wall.
-![cut](https://i.imgur.com/WMyfwoG.gif)
+![cut](https://i.imgur.com/wn4grm8.gif)
 
 ## Wall Merging
 
 Using this tool you can incorporate any wall segments that intersect the selected wall or that overlap said wall.
-![merge](https://i.imgur.com/tz9aFxF.gif)
+![merge](https://i.imgur.com/16EHuRB.gif)
 
 # Installing
 
