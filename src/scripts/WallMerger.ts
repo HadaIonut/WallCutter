@@ -292,7 +292,13 @@ class WallMerger {
         return Math.sqrt(Math.pow(line[2] - line[0], 2) + Math.pow(line[3] - line[1], 2));
     }
 
-    private _getOverlappingSelectedWalls (selectedWalls: any) {
+    /**
+     * Returns an arr
+     *
+     * @param selectedWalls
+     * @private
+     */
+    private _getMainWalls (selectedWalls: any) {
         const wallsToMerge = [];
 
         selectedWalls.forEach((wall) => {
@@ -304,12 +310,7 @@ class WallMerger {
                 if (this._calculateLineLength(overlappingWall.data.c) < wallLength) shouldMerge.push(overlappingWall);
             })
 
-            if (shouldMerge.length !== 0){
-                wallsToMerge.push({
-                    target: wall,
-                    toBeMerged: shouldMerge
-                })
-            }
+            if (shouldMerge.length !== 0) wallsToMerge.push(wall);
         })
 
         return wallsToMerge;
@@ -368,10 +369,10 @@ class WallMerger {
 
     public async mergeAllSelectedWalls() {
         const selectedWalls = this._getSelectedWalls();
-        const wallsToMerge = this._getOverlappingSelectedWalls(selectedWalls);
+        const wallsToMerge = this._getMainWalls(selectedWalls);
 
         for (const structure of wallsToMerge) {
-            await this.mergeWalls(structure.target);
+            await this.mergeWalls(structure);
         }
     }
 }
