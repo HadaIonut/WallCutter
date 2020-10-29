@@ -5,7 +5,7 @@
   "author": ["HadaIonut"],
   "version": "1.0.0",
   "esmodules": ["scripts/WallCutter.js"],
-  "styles": [""],
+  "styles": [],
   "minimumCoreVersion": "0.6.0",
   "compatibleCoreVersion": "0.7.5",
   "url": "https://github.com/HadaIonut/WallCutter",
