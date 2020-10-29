@@ -1,6 +1,17 @@
 import WallCutting from "./WallCutting";
 import WallMerger from "./WallMerger";
 
+Hooks.on("getSceneControlButtons", (controls)=> {
+    const mergeSelected = {
+        name: "mergeSelected",
+        title: "Merge Selected",
+        icon: "fas fa-code-branch",
+        onClick: () => WallMerger.mergeAllSelectedWalls(),
+        button: true
+    }
+    controls[4].tools.push (mergeSelected);
+})
+
 Hooks.on("renderWallConfig", (data, $html) => {
     if (!game.user.isGM) return;
 

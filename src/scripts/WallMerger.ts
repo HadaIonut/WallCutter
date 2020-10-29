@@ -283,6 +283,33 @@ class WallMerger {
     }
 
     /**
+     * Returns length of a line
+     *
+     * @param line
+     * @private
+     */
+    private _calculateLineLength(line: number[]) {
+        return Math.sqrt(Math.pow(line[2] - line[0], 2) + Math.pow(line[3] - line[1], 2));
+    }
+
+    /**
+     * Returns a list of all the selected walls
+     *
+     * @private
+     */
+    private _getSelectedWalls(): any {
+        const walls = canvas.walls.objects.children;
+        const selectedWalls = [];
+
+        walls.forEach((wall) => {
+            if (wall._controlled) selectedWalls.push(wall);
+        })
+
+        return selectedWalls;
+    }
+
+
+    /**
      * I was very high on coffee, I have no idee what the fuck does this do
      *
      * @param mainWall - the main wall object
@@ -314,6 +341,29 @@ class WallMerger {
         mainWall.release();
         await mainWall.delete();
         await this._createNewWallFromPointsArray(projectedPoints, mainWallData);
+    }
+
+    public mergeAllSelectedWalls() {
+        const selectedWalls = this._getSelectedWalls();
+        const wallsToMerge = [];
+
+        selectedWalls.forEach((wall) => {
+            const overlappingWalls = this._findOverlappingWalls(wall.data.c, wall);
+            const wallLength = this._calculateLineLength(wall.data.c);
+            const shouldMerge = [];
+
+            overlappingWalls.forEach((overlappingWall) => {
+                if (this._calculateLineLength(overlappingWall.data.c) < wallLength) shouldMerge.push(overlappingWall);
+            })
+
+            if (shouldMerge.length !== 0){
+                wallsToMerge.push({
+                    target: wall,
+                    toBeMerged: shouldMerge
+                })
+            }
+        })
+
     }
 }
 
