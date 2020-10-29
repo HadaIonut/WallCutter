@@ -292,6 +292,29 @@ class WallMerger {
         return Math.sqrt(Math.pow(line[2] - line[0], 2) + Math.pow(line[3] - line[1], 2));
     }
 
+    private _getOverlappingSelectedWalls (selectedWalls: any) {
+        const wallsToMerge = [];
+
+        selectedWalls.forEach((wall) => {
+            const overlappingWalls = this._findOverlappingWalls(wall.data.c, wall);
+            const wallLength = this._calculateLineLength(wall.data.c);
+            const shouldMerge = [];
+
+            overlappingWalls.forEach((overlappingWall) => {
+                if (this._calculateLineLength(overlappingWall.data.c) < wallLength) shouldMerge.push(overlappingWall);
+            })
+
+            if (shouldMerge.length !== 0){
+                wallsToMerge.push({
+                    target: wall,
+                    toBeMerged: shouldMerge
+                })
+            }
+        })
+
+        return wallsToMerge;
+    }
+
     /**
      * Returns a list of all the selected walls
      *
@@ -343,27 +366,13 @@ class WallMerger {
         await this._createNewWallFromPointsArray(projectedPoints, mainWallData);
     }
 
-    public mergeAllSelectedWalls() {
+    public async mergeAllSelectedWalls() {
         const selectedWalls = this._getSelectedWalls();
-        const wallsToMerge = [];
+        const wallsToMerge = this._getOverlappingSelectedWalls(selectedWalls);
 
-        selectedWalls.forEach((wall) => {
-            const overlappingWalls = this._findOverlappingWalls(wall.data.c, wall);
-            const wallLength = this._calculateLineLength(wall.data.c);
-            const shouldMerge = [];
-
-            overlappingWalls.forEach((overlappingWall) => {
-                if (this._calculateLineLength(overlappingWall.data.c) < wallLength) shouldMerge.push(overlappingWall);
-            })
-
-            if (shouldMerge.length !== 0){
-                wallsToMerge.push({
-                    target: wall,
-                    toBeMerged: shouldMerge
-                })
-            }
-        })
-
+        for (const structure of wallsToMerge) {
+            await this.mergeWalls(structure.target);
+        }
     }
 }
 
