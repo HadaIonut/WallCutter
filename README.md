@@ -18,6 +18,10 @@ This is the simplest tool to use. It simply creates a new connection point in th
 Using this tool you can incorporate any wall segments that intersect the selected wall or that overlap said wall.
 ![merge](https://i.imgur.com/16EHuRB.gif)
 
+# Merging all selected walls
+Using this tool, you can merge all the walls selected using foundry's wall selection tool
+![mergeSelected](https://i.imgur.com/thW4EPt.gif)
+
 # Installing
 
 The module can be found on the foundry vtt module installer.
