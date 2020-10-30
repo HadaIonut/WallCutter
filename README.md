@@ -1,5 +1,5 @@
 # Wall Cutter
-![downloads](https://img.shields.io/github/downloads/HadaIonut/WallCutter/v1.0.1/WallCutter.zip?style=for-the-badge)
+![downloads](https://img.shields.io/github/downloads/HadaIonut/WallCutter/v1.1.0/WallCutter.zip?style=for-the-badge)
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A32J9GM)
 
 Wall Cutter is a foundry vtt module that offers a few new tools that accelerate the creation of walls.
