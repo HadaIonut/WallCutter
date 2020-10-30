@@ -9,7 +9,7 @@ Hooks.on("getSceneControlButtons", (controls)=> {
         onClick: () => WallMerger.mergeAllSelectedWalls(),
         button: true
     }
-    controls[4].tools.push (mergeSelected);
+    controls[4].tools.splice(7,0,mergeSelected);
 })
 
 Hooks.on("renderWallConfig", (data, $html) => {
