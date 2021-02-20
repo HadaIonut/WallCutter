@@ -92,7 +92,7 @@ class WallMerger {
      * @private
      */
     private _shouldIMerge(mainWall: any, currentWall: any): boolean {
-        const linkedSegments = mainWall.getLinkedSegments().walls;
+        const linkedSegments = mainWall._object.getLinkedSegments().walls;
         for (const segment of linkedSegments) {
             if (segment === currentWall) return false;
         }
@@ -362,7 +362,7 @@ class WallMerger {
             return a.c[0] - b.c[0];
         });
 
-        mainWall.release();
+        mainWall._object.release();
         await mainWall.delete();
         await this._createNewWallFromPointsArray(projectedPoints, mainWallData);
     }

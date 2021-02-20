@@ -12,7 +12,7 @@ class WallCutting {
 
     private async _createWallAtCoords(coords: number[], wall: any) {
         // @ts-ignore
-        await Wall.create({
+        return await Wall.create({
             c: coords,
             flags: wall.data.flags,
             move: wall.data.move,
@@ -35,7 +35,7 @@ class WallCutting {
 
     public async cutTheWall(wall: any) {
         await this._createNewWalls(wall);
-        wall.release();
+        wall._object.release();
         await wall.delete();
     }
 
