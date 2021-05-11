@@ -3,13 +3,13 @@
   "title": "Wall Cutter",
   "description": "Ever wanted to be able to cut existing walls? Well now you can. Wall Cutter offers new features for your wall breaking needs.",
   "author": ["HadaIonut"],
-  "version": "1.1.0",
+  "version": "1.1.1",
   "esmodules": ["scripts/WallCutter.js"],
   "styles": [],
-  "minimumCoreVersion": "0.6.0",
-  "compatibleCoreVersion": "0.7.5",
+  "minimumCoreVersion": "0.8.2",
+  "compatibleCoreVersion": "0.8.3",
   "url": "https://github.com/HadaIonut/WallCutter",
-  "manifest": "https://github.com/HadaIonut/WallCutter/releases/download/v1.1.0/module.json",
-  "download": "https://github.com/HadaIonut/WallCutter/releases/download/v1.1.0/WallCutter.zip",
+  "manifest": "https://github.com/HadaIonut/WallCutter/releases/download/v1.1.1/module.json",
+  "download": "https://github.com/HadaIonut/WallCutter/releases/download/v1.1.1/WallCutter.zip",
   "changelog": ""
 }
