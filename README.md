@@ -1,5 +1,5 @@
 # Wall Cutter
-![downloads](https://img.shields.io/github/downloads/HadaIonut/WallCutter/v1.1.0/WallCutter.zip?style=for-the-badge)
+![downloads](https://img.shields.io/github/downloads/HadaIonut/WallCutter/1.1.1/WallCutter.zip?style=for-the-badge)
 ![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2FWallCutter&colorB=4aa94a&style=for-the-badge)
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A32J9GM)
 
