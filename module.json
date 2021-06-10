@@ -9,7 +9,7 @@
   "minimumCoreVersion": "0.8.2",
   "compatibleCoreVersion": "0.8.3",
   "url": "https://github.com/HadaIonut/WallCutter",
-  "manifest": "https://github.com/HadaIonut/WallCutter/releases/download/v1.1.1/module.json",
-  "download": "https://github.com/HadaIonut/WallCutter/releases/download/v1.1.1/WallCutter.zip",
+  "manifest": "https://github.com/HadaIonut/WallCutter/releases/download/1.1.1/module.json",
+  "download": "https://github.com/HadaIonut/WallCutter/releases/download/1.1.1/WallCutter.zip",
   "changelog": ""
 }
